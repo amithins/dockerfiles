@@ -2,20 +2,31 @@ FROM centos:latest
 
 #MAINTAINER ilaocai <kohou.hu@aliyun.com>
 
-RUN yum update -y && yum install -y httpd
+# httpd & ssh install
+RUN yum update -y && yum install -y httpd openssh-server
 
+# httpd config
+RUN sed -i '151s/None/All/' /etc/httpd/conf/httpd.conf
+
+# ssh server config
+RUN sed -i '79d' /etc/ssh/sshd_config
+RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -P ''
+RUN sed -i '30,31s/^/\#/' /etc/ssh/sshd_config
+RUN mkdir /root/.ssh
+COPY id_rsa.pub /root/.ssh/authorized_keys
+
+# php install
 RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 RUN rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
 RUN yum install -y --enablerepo=remi --enablerepo=remi-php56 php php-mysql php-gd php-mbstring php-xml php-posix php-intl
 
-RUN sed -i '151s/None/All/' /etc/httpd/conf/httpd.conf
 RUN sed '889c date.timezone \= Asia\/Shanghai' -i /etc/php.ini
 
+# symfony install
 RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony && chmod a+x /usr/local/bin/symfony
 
 WORKDIR /var/www/html
 
-EXPOSE 80 8000
+EXPOSE 80 8000 22
 
-CMD ["/bin/bash"]
-#CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+ENTRYPOINT /usr/sbin/httpd && /usr/sbin/sshd -D

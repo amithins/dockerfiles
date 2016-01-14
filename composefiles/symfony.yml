@@ -1,7 +1,4 @@
 symfony:
-  image: "php:ilaocai"
-  ports:
-    - 80:80
-    - 443:443
+  image: "symfony:ilaocai"
   volumes:
     - /var/www/html:/var/www/html
