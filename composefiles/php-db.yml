@@ -1,0 +1,14 @@
+web:
+  image: "php:ilaocai"
+  ports:
+    - 80:80
+    - 443:443
+  links:
+    - db:mysql
+  volumes:
+    - /var/www/html:/var/www/html
+
+db:
+  image: mariadb
+  environment:
+    MYSQL_ROOT_PASSWORD: password

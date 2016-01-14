@@ -1,0 +1,21 @@
+FROM centos:latest
+
+#MAINTAINER ilaocai <kohou.hu@aliyun.com>
+
+RUN yum update -y && yum install -y httpd
+
+RUN rpm -Uvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+RUN rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+RUN yum install -y --enablerepo=remi --enablerepo=remi-php56 php php-mysql php-gd php-mbstring php-xml php-posix php-intl
+
+RUN sed -i '151s/None/All/' /etc/httpd/conf/httpd.conf
+RUN sed '889c date.timezone \= Asia\/Shanghai' -i /etc/php.ini
+
+#RUN curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony && chmod a+x /usr/local/bin/symfony
+
+WORKDIR /var/www/html
+
+EXPOSE 80 8000 443 8080
+
+#CMD ["/bin/bash"]
+CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
